@@ -1,0 +1,6 @@
+{
+  "name": "Madurai AI Water-Borne Disease & Health System",
+  "description": "Government monitoring and AI inspector assistance platform for water-borne disease tracking, mosquito breeding detection, and public safety in Madurai Corporation.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
