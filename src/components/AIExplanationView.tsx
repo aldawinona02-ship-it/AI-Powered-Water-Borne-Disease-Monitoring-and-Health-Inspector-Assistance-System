@@ -59,11 +59,18 @@ export default function AIExplanationView({
       if (data.success && data.explanation) {
         setAiExplanationText(data.explanation);
       } else {
-        setAiExplanationText("Failed to retrieve administrative explainable analysis.");
+        const { generateLocalWardExplanation } = await import('../utils/clientDb');
+        setAiExplanationText(generateLocalWardExplanation(wardInfo.ward, wardInfo.zone, wardInfo));
       }
     } catch (err) {
-      console.error(err);
-      setAiExplanationText("Service connection timed out. Power safety threshold active.");
+      console.warn("Backend API unavailable. Falling back to local administrative analysis generation.", err);
+      try {
+        const { generateLocalWardExplanation } = await import('../utils/clientDb');
+        setAiExplanationText(generateLocalWardExplanation(wardInfo.ward, wardInfo.zone, wardInfo));
+      } catch (localErr) {
+        console.error(localErr);
+        setAiExplanationText("Service connection timed out. Power safety threshold active.");
+      }
     } finally {
       setExplainerLoading(false);
     }

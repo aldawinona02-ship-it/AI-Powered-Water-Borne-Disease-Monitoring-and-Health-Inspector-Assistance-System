@@ -105,7 +105,16 @@ export default function App() {
       setPatients(patientsData);
       setPredictions(predData);
     } catch (err) {
-      console.error("Link to full-stack Express backend currently stale, initializing fallback seed data:", err);
+      console.warn("Link to full-stack Express backend currently stale, initializing fallback seed data:", err);
+      try {
+        const { getLocalWardRisks, getLocalComplaints, getLocalPatients, getLocalPredictions } = await import('./utils/clientDb');
+        setWardRisks(getLocalWardRisks());
+        setComplaints(getLocalComplaints());
+        setPatients(getLocalPatients());
+        setPredictions(getLocalPredictions());
+      } catch (fallbackErr) {
+        console.error("Local client database initialization failed:", fallbackErr);
+      }
     } finally {
       setLoading(false);
     }
@@ -141,7 +150,15 @@ export default function App() {
         fetchBackendData(); // Recalculate risk scores
       }
     } catch (err) {
-      console.error(err);
+      console.warn("Express backend unavailable, reporting case locally:", err);
+      try {
+        const { reportLocalCase } = await import('./utils/clientDb');
+        const newPatient = reportLocalCase(payload);
+        setPatients(prev => [newPatient, ...prev]);
+        fetchBackendData();
+      } catch (localErr) {
+        console.error(localErr);
+      }
     }
   };
 
@@ -168,7 +185,16 @@ export default function App() {
         fetchBackendData(); // Triggers risk update (e.g., resolving threat drops critical indicators)
       }
     } catch (err) {
-      console.error(err);
+      console.warn("Express backend unavailable, executing inspector action locally:", err);
+      try {
+        const { actionLocalComplaint } = await import('./utils/clientDb');
+        const inspectorId = loggedInInspector ? loggedInInspector.id : 'HI-TN-2026-DEFAULT';
+        const updatedComplaint = actionLocalComplaint(cId, action, comment, inspectorId);
+        setComplaints(prev => prev.map(c => c.id === cId ? updatedComplaint : c));
+        fetchBackendData();
+      } catch (localErr) {
+        console.error(localErr);
+      }
     }
   };
 
