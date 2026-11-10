@@ -5,5 +5,5 @@
 
 This contains everything you need to run your app locally.
 
-View your app : https://ai-water-borne-disease-monitoring-4192-121594234544.asia-southeast1.run.app
+View your app : https://ai-waterborne-1018265212685.asia-east1.run.app
 
